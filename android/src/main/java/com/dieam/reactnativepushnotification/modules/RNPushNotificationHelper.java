@@ -562,10 +562,14 @@ public class RNPushNotificationHelper {
                     }
                     else{
                         // Add "action" for later identifying which button gets pressed
+                        int buttonColor = android.R.color.holo_green_light;
+                        if(action.equals("Reject") || action.equals("Decline")) {
+                            buttonColor = android.R.color.holo_red_light;
+                        }
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                          notification.addAction(new NotificationCompat.Action.Builder(icon, action, pendingActionIntent).build());
+                          notification.addAction(new NotificationCompat.Action.Builder(icon, getActionText(action,buttonColor), pendingActionIntent).build());
                         } else {
-                          notification.addAction(icon, action, pendingActionIntent);
+                          notification.addAction(icon, getActionText(action,buttonColor), pendingActionIntent);
                         }
                     }
                 }
@@ -606,6 +610,14 @@ public class RNPushNotificationHelper {
         } catch (Exception e) {
             Log.e(LOG_TAG, "failed to send push notification", e);
         }
+    }
+    
+    private Spannable getActionText(String title, @ColorRes int colorRes) {
+        Spannable spannable = new SpannableString(title);
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N_MR1) {
+            spannable.setSpan(new ForegroundColorSpan(ContextCompat.getColor(context, colorRes)), 0, spannable.length(), 0);
+        }
+        return spannable;
     }
 
     private void scheduleNextNotificationIfRepeating(Bundle bundle) {
